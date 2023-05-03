@@ -9,7 +9,7 @@ class VentanaPrincipal(QWidget):
         self.resize(1200, 600)
 
         # Importar el dataset
-        self.ds = pandas.read_csv('movies.csv')
+        self.ds = pandas.read_csv('Dataset/movies.csv')
 
         # Widgets de búsqueda
         self.film = QLineEdit()
