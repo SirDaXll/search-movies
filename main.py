@@ -1,12 +1,12 @@
 import sys
 import pandas
-from PyQt6.QtWidgets import QApplication, QLabel, QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QWidget, QComboBox, QTableWidget, QTableWidgetItem
+from PyQt6.QtWidgets import QApplication, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QComboBox, QWidget, QTableWidget, QTableWidgetItem, QPushButton
 
 class VentanaPrincipal(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle('Películas más taquilleras entre 2007 y 2011')
-        self.resize(1000, 600)
+        self.resize(1200, 600)
 
         # Importar el dataset
         self.ds = pandas.read_csv('movies.csv')
@@ -41,8 +41,8 @@ class VentanaPrincipal(QWidget):
         # Tabla de resultados
         self.resultTable = QTableWidget()
         self.resultTable.setColumnCount(8)
-        self.resultTable.setRowCount(0)
         self.resultTable.setHorizontalHeaderLabels(['Película', 'Género', 'Estudio Principal', 'Puntuación del Público %', 'Rentabilidad', 'Rotten Tomatoes %', 'Bruto mundial', 'Año'])
+        self.resultTable.setRowCount(0)
 
         # Layouts
         search = QVBoxLayout()
@@ -81,7 +81,7 @@ class VentanaPrincipal(QWidget):
         year = self.year.currentText()
 
         # Filtrar el Data Set
-        query_str = f'film.str.lower().str.contains("{film}"")'
+        query_str = f'Film.str.lower().str.contains("{film}")'
         if genre != 'Todos':
             query_str += f' and Genre == {genre}'
         if leadStudio != 'Todos':
@@ -90,7 +90,7 @@ class VentanaPrincipal(QWidget):
             query_str += f' and "Audience score %" == {audienceScore}'
         if profitability != '':
             query_str += f' and Profitability == {profitability}'
-        if rottenTomatoes != 'Todos':
+        if rottenTomatoes != '':
             query_str += f' and "Rotten Tomatoes %" == {rottenTomatoes}'
         if worldwideGross != '':
             query_str += f' and "Worldwide Gross" == {worldwideGross}'
@@ -106,7 +106,7 @@ class VentanaPrincipal(QWidget):
             genreItem = QTableWidgetItem(row['Genre'])
             leadStudioItem = QTableWidgetItem(row['Lead Studio'])
             audienceScoreItem = QTableWidgetItem(str(row['Audience score %']))
-            profitabilityItem = QTableWidgetItem(str(row['Porfitability']))
+            profitabilityItem = QTableWidgetItem(str(row['Profitability']))
             rottenTomatoesItem = QTableWidgetItem(str(row['Rotten Tomatoes %']))
             worldwideGrossItem = QTableWidgetItem(str(row['Worldwide Gross']))
             yearItem = QTableWidgetItem(str(row['Year']))
