@@ -1,12 +1,13 @@
 import sys
 import pandas
 from PyQt6.QtWidgets import QApplication, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QComboBox, QWidget, QTableWidget, QTableWidgetItem, QPushButton
+from PyQt6.QtGui import QIcon
 
 class VentanaPrincipal(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle('Películas más taquilleras entre 2007 y 2011')
-        self.resize(1200, 600)
+        self.resize(1200, 400)
 
         # Importar el dataset
         self.ds = pandas.read_csv('Dataset/movies.csv')
@@ -15,10 +16,10 @@ class VentanaPrincipal(QWidget):
         self.film = QLineEdit()
         self.genre = QComboBox()
         self.leadStudio = QComboBox()
-        self.audienceScore = QLineEdit()
-        self.profitability = QLineEdit()
-        self.rottenTomatoes = QLineEdit()
-        self.worldwideGross = QLineEdit()
+        #self.audienceScore = QLineEdit()
+        #self.profitability = QLineEdit()
+        #self.rottenTomatoes = QLineEdit()
+        #self.worldwideGross = QLineEdit()
         self.year = QComboBox()
 
         # Configurar opciones de ComboBox
@@ -52,14 +53,14 @@ class VentanaPrincipal(QWidget):
         search.addWidget(self.genre)
         search.addWidget(QLabel('Estudio Principal:'))
         search.addWidget(self.leadStudio)
-        search.addWidget(QLabel('Puntuación del Público %:'))
-        search.addWidget(self.audienceScore)
-        search.addWidget(QLabel('Rentabilidad:'))
-        search.addWidget(self.profitability)
-        search.addWidget(QLabel('Rotten Tomatoes %'))
-        search.addWidget(self.rottenTomatoes)
-        search.addWidget(QLabel('Bruto mundial:'))
-        search.addWidget(self.worldwideGross)
+        #search.addWidget(QLabel('Puntuación del Público %:'))
+        #search.addWidget(self.audienceScore)
+        #search.addWidget(QLabel('Rentabilidad:'))
+        #search.addWidget(self.profitability)
+        #search.addWidget(QLabel('Rotten Tomatoes %'))
+        #search.addWidget(self.rottenTomatoes)
+        #search.addWidget(QLabel('Bruto mundial:'))
+        #search.addWidget(self.worldwideGross)
         search.addWidget(QLabel('Año:'))
         search.addWidget(self.year)
         search.addWidget(self.searchButton)
@@ -74,37 +75,43 @@ class VentanaPrincipal(QWidget):
         film = self.film.text().lower()
         genre = self.genre.currentText()
         leadStudio = self.leadStudio.currentText()
-        audienceScore = self.audienceScore.text()
-        profitability = self.profitability.text()
-        rottenTomatoes = self.rottenTomatoes.text()
-        worldwideGross = self.worldwideGross.text()
+        #audienceScore = self.audienceScore.text()
+        #profitability = self.profitability.text()
+        #rottenTomatoes = self.rottenTomatoes.text()
+        #worldwideGross = self.worldwideGross.text()
         year = self.year.currentText()
 
         # Filtrar el Data Set
-        query_str = f'Film.str.lower().str.contains("{film}")'
+        query = f'Film.str.lower().str.contains("{film}")'
         if genre != 'Todos':
-            query_str += f' and Genre == {genre}'
+            query += f' and Genre == "{genre}"'
         if leadStudio != 'Todos':
-            query_str += f' and "Lead Studio" == {leadStudio}'
-        if audienceScore != '':
-            query_str += f' and "Audience score %" == {audienceScore}'
-        if profitability != '':
-            query_str += f' and Profitability == {profitability}'
-        if rottenTomatoes != '':
-            query_str += f' and "Rotten Tomatoes %" == {rottenTomatoes}'
-        if worldwideGross != '':
-            query_str += f' and "Worldwide Gross" == {worldwideGross}'
-        if year != 'Todos':
-            query_str += f' and Year == {year}'
+            query += f' and "Lead Studio" == "{leadStudio}"'
 
-        filtered_ds = self.ds.query(query_str)
+        # Filtro para ordenar de mayor a menor y visceversa
+        #if audienceScore != '':
+        #    query += f' and "Audience score %" == {audienceScore}'
+        #if profitability != '':
+        #    query += f' and Profitability == {profitability}'
+        #if rottenTomatoes != '':
+        #    query += f' and "Rotten Tomatoes %" == {rottenTomatoes}'
+        #if worldwideGross != '':
+        #    query += f' and "Worldwide Gross" == {worldwideGross}'
+
+        if year != 'Todos':
+            query += f' and Year == "{year}"'
+
+        # Optimizar tabla según filtro
+        filtro = self.ds.query(query)
+        filtro = filtro.dropna()
+        filtro = filtro.reset_index(drop = True)
 
         # Mostrar los resultados de la tabla
-        self.resultTable.setRowCount(len(filtered_ds))
-        for i, row in filtered_ds.iterrows():
+        self.resultTable.setRowCount(len(filtro))
+        for i, row in filtro.iterrows():
             filmItem = QTableWidgetItem(row['Film'])
             genreItem = QTableWidgetItem(row['Genre'])
-            leadStudioItem = QTableWidgetItem(row['Lead Studio'])
+            leadStudioItem = QTableWidgetItem(str(row['Lead Studio']))
             audienceScoreItem = QTableWidgetItem(str(row['Audience score %']))
             profitabilityItem = QTableWidgetItem(str(row['Profitability']))
             rottenTomatoesItem = QTableWidgetItem(str(row['Rotten Tomatoes %']))
@@ -120,8 +127,11 @@ class VentanaPrincipal(QWidget):
             self.resultTable.setItem(i, 6, worldwideGrossItem)
             self.resultTable.setItem(i, 7, yearItem)
 
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     ventana = VentanaPrincipal()
+    icon = QIcon('nota.png')
+    ventana.setWindowIcon(icon)
     ventana.show()
     app.exec()
